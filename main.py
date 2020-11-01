@@ -16,11 +16,15 @@ async def main():
 
     # Send a few messages
     count = 0
+    tempFile = open("/sys/class/thermal/thermal_zone0/temp", "r")
     while count < 5:
+        cpu_temp = tempFile.read()
+        cpu_temp_float = float(cpu_temp)
+        tempFile.seek(0)
         print("Sending message to Azure IoT...")
         msg = Message("Environment sensor")
         msg.message_id = uuid.uuid4()
-        msg.custom_properties["Temperature"] = "45"
+        msg.custom_properties["Temperature"] = cpu_temp_float
         await device_client.send_message(msg)
         print("Message successfully sent:")
         print(msg.custom_properties)
